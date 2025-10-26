@@ -39,3 +39,17 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Firebase / API keys
+firebase-key.json
+serviceAccountKey.json
+google-services.json
+
+# Local libraries or config
+/lib/**/*.env
+/lib/**/*.json
+
+# Local IDE settings
+.vscode/
+.idea/
+*.swp
