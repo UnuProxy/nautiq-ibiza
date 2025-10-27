@@ -7,6 +7,8 @@ const navItems: NavItem[] = [
   { href: "/fleet", label: "Boats" },
   { href: "/why-us", label: "Why us" },
   { href: "/catering", label: "Catering" },
+  { href: "/blog", label: "Blog" },          
+  { href: "/faq", label: "FAQ" },            
   { href: "#contact", label: "Enquire", isButton: true },
 ];
 

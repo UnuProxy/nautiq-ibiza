@@ -187,6 +187,8 @@ function FAQSchema() {
    Page
    ======================================================================== */
 export default function NautiqVisualPage() {
+  const [openRequestSheet, setOpenRequestSheet] = useState(false);
+
   return (
     <main className="bg-white">
       <script
@@ -220,6 +222,8 @@ export default function NautiqVisualPage() {
           }),
         }}
       />
+      {/* ⬇️ ADD PADDING WRAPPER FOR MOBILE TAB BAR */}
+      <div className="pb-[80px] md:pb-0">
       <HeroWithMedia />
       <TrustBar />
       <OneConversation />
@@ -230,9 +234,12 @@ export default function NautiqVisualPage() {
       {/* <LocalTeam /> */}
       <Testimonials />
       <ContactSection />
+      </div>
       <FAQSchema />
-      <MobileTabBar />
-      <MobileFloatingCTA />
+      {/* ⬇️ PASS SHEET STATE TO TAB BAR */}
+      <MobileTabBar openRequestSheet={openRequestSheet} setOpenRequestSheet={setOpenRequestSheet} />
+      {/* ⬇️ MOVED SHEET HERE WITH STATE FROM PARENT */}
+      <MobileBottomSheet open={openRequestSheet} onClose={() => setOpenRequestSheet(false)} />
       <GlobalMobileStyles />
     </main>
   );
@@ -247,6 +254,12 @@ function GlobalMobileStyles() {
       :root {
         --safe-bottom: env(safe-area-inset-bottom);
         --safe-top: env(safe-area-inset-top);
+      }
+      @supports (padding: max(0px)) {
+        body {
+          padding-left: max(0px, env(safe-area-inset-left));
+          padding-right: max(0px, env(safe-area-inset-right));
+        }
       }
       html {
         -webkit-overflow-scrolling: touch;
@@ -356,11 +369,11 @@ function HeroWithMedia() {
   }, []);
 
   const typed = useTypewriter([
-    "Check availability for summer 26",
-    "8 guests, €1,200 budget",
-    "Book with a real captain",
-    "Find me the best reviews",
-    "Organise my full day at sea",
+    "Luxury yacht charter Ibiza",
+    "Skippered boats from €800/day",
+    "Hand-picked options in 10 mins",
+    "Day trips or week-long adventures",
+    "Local captains, perfect reviews",
   ]);
 
   return (
@@ -886,24 +899,26 @@ function MobileBottomSheet({ open, onClose }: { open: boolean; onClose: () => vo
       <div className="absolute bottom-0 left-0 right-0 rounded-t-2xl bg-white shadow-2xl border-t border-slate-200 pt-2 pb-[calc(12px+var(--safe-bottom))]">
         <div className="mx-auto w-12 h-1.5 rounded-full bg-slate-300 mb-3" />
         <div className="px-4">
-          <h3 className="text-xl font-medium text-[#0B1120] mb-4">Quick request</h3>
+          {/* ⬇️ IMPROVED HEADER - More descriptive */}
+          <h3 className="text-lg font-semibold text-[#0B1120] mb-1">Tell us your details</h3>
+          <p className="text-xs text-slate-600 mb-4">We'll send 3 hand-picked options within 10 mins</p>
           <div className="grid grid-cols-3 gap-2 mb-3">
-            <input type="date" name="date" value={formData.date} onChange={handleChange} className="px-3 py-3 rounded-xl border border-slate-200 text-sm" />
-            <input type="number" name="guests" min={1} max={12} placeholder="Guests" value={formData.guests} onChange={handleChange} className="px-3 py-3 rounded-xl border border-slate-200 text-sm" />
-            <input type="text" name="budget" placeholder="Budget €" value={formData.budget} onChange={handleChange} className="px-3 py-3 rounded-xl border border-slate-200 text-sm" />
+            <input type="date" name="date" value={formData.date} onChange={handleChange} className="px-3 py-3 rounded-xl border border-slate-200 text-sm placeholder-slate-400" placeholder="Date" />
+            <input type="number" name="guests" min={1} max={12} placeholder="Guests" value={formData.guests} onChange={handleChange} className="px-3 py-3 rounded-xl border border-slate-200 text-sm placeholder-slate-400" />
+            <input type="text" name="budget" placeholder="Budget €" value={formData.budget} onChange={handleChange} className="px-3 py-3 rounded-xl border border-slate-200 text-sm placeholder-slate-400" />
           </div>
-          <input type="text" name="contact" placeholder="Your WhatsApp or email" value={formData.contact} onChange={handleChange} className="w-full px-3 py-3 rounded-xl border border-slate-200 text-sm mb-3" />
+          <input type="text" name="contact" placeholder="Your WhatsApp or email" value={formData.contact} onChange={handleChange} className="w-full px-3 py-3 rounded-xl border border-slate-200 text-sm mb-4 placeholder-slate-400" />
           <div className="flex gap-2">
-            <a href={WHATSAPP_LINK} className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-[#2095AE] text-white rounded-xl text-base font-semibold">
+            <a href={WHATSAPP_LINK} className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-[#2095AE] text-white rounded-xl text-base font-semibold hover:bg-[#1a7d94] transition-colors">
               <MessageCircle className="w-5 h-5" />
-              WhatsApp
+              Send
             </a>
-            <button onClick={onClose} className="px-4 py-3 rounded-xl border border-slate-300 text-base font-medium">
+            <button onClick={onClose} className="px-4 py-3 rounded-xl border border-slate-300 text-base font-medium hover:bg-slate-50 transition-colors">
               Close
             </button>
           </div>
           <p className="text-[11px] text-slate-500 mt-3">
-            By sending, you agree to our <Link href="/privacy" className="underline">Privacy Policy</Link>.
+            By sending, you agree to our <Link href="/privacy" className="underline hover:text-slate-600">Privacy Policy</Link>.
           </p>
         </div>
       </div>
@@ -911,49 +926,40 @@ function MobileBottomSheet({ open, onClose }: { open: boolean; onClose: () => vo
   );
 }
 
-function MobileFloatingCTA() {
-  const [visible, setVisible] = useState(false);
-  const [openSheet, setOpenSheet] = useState(false);
 
-  useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > 280);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  return (
-    <>
-      {visible && (
-        <div className="md:hidden fixed bottom-[calc(64px+var(--safe-bottom))] right-4 z-50">
-          <button
-            onClick={() => setOpenSheet(true)}
-            className="px-5 py-4 bg-[#2095AE] text-white rounded-full shadow-2xl hover:bg-[#1a7d94] transition-all flex items-center gap-2 font-medium min-h-[48px]"
-            aria-label="Open quick enquiry"
-          >
-            <MessageSquare className="w-5 h-5" />
-            Quick request
-          </button>
-        </div>
-      )}
-      <MobileBottomSheet open={openSheet} onClose={() => setOpenSheet(false)} />
-    </>
-  );
-}
-
-function MobileTabBar() {
+function MobileTabBar({ 
+  openRequestSheet, 
+  setOpenRequestSheet 
+}: { 
+  openRequestSheet: boolean; 
+  setOpenRequestSheet: (open: boolean) => void;
+}) {
   const TAB_HEIGHT = 64;
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur border-t border-slate-200"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-t border-slate-200"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-      aria-label="Primary"
+      aria-label="Primary navigation"
     >
       <div className="flex items-center justify-around px-2" style={{ height: TAB_HEIGHT }}>
-        <TabLink href="#top" icon={<Home className="w-5 h-5" />} label="Home" />
-        <TabLink href="#fleet" icon={<Ship className="w-5 h-5" />} label="Fleet" />
-        <TabLink href={WHATSAPP_LINK} icon={<MessageCircle className="w-5 h-5" />} label="Chat" />
+        {/* ⬇️ HOME - LINK TO HOMEPAGE */}
+        <TabLink href="/" icon={<Home className="w-5 h-5" />} label="Home" />
+        
+        {/* ⬇️ FLEET - LINK TO FLEET PAGE */}
+        <TabLink href="/fleet" icon={<Ship className="w-5 h-5" />} label="Fleet" />
+        
+        {/* ⬇️ REQUEST - OPENS BOTTOM SHEET (NOT EXTERNAL LINK) */}
+        <button
+          onClick={() => setOpenRequestSheet(true)}
+          className="w-1/4 inline-flex flex-col items-center justify-center gap-1 py-2 rounded-xl active:bg-slate-100 text-slate-700 hover:text-[#2095AE] transition-colors"
+          aria-label="Send request"
+        >
+          <MessageSquare className="w-5 h-5" />
+          <span className="text-[11px] leading-none font-medium">Request</span>
+        </button>
+        
+        {/* ⬇️ CALL - DIRECT PHONE LINK */}
         <TabLink href="tel:+34692688348" icon={<Phone className="w-5 h-5" />} label="Call" />
       </div>
     </nav>
@@ -961,12 +967,12 @@ function MobileTabBar() {
 }
 
 function TabLink({ href, icon, label }: { href: string; icon: React.ReactNode; label: string }) {
-  const classes = "w-1/4 inline-flex flex-col items-center justify-center gap-1 py-2 rounded-xl active:bg-slate-100 text-slate-700";
+  const classes = "w-1/4 inline-flex flex-col items-center justify-center gap-1 py-2 rounded-xl active:bg-slate-100 text-slate-700 hover:text-[#2095AE] transition-colors";
 
   return (
     <a href={href} className={classes}>
       {icon}
-      <span className="text-[11px] leading-none">{label}</span>
+      <span className="text-[11px] leading-none font-medium">{label}</span>
     </a>
   );
 }
